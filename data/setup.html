@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Wi-Fi Setup</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+    <div class="content">
+        <img src="logo.png" alt="Spoddify Mopped" />
+        <h2>Wi-Fi Setup</h2>
+        <form id="setup" class="form-container" onsubmit="submit">
+            <span class="input-container">
+                <label for="ssid">SSID</label>
+                <input type="text" id="ssid" name="ssid"><br>
+            </span>
+            <span class="input-container">
+                <label for="pass">Password</label>
+                <input type="password" id="pass" name="pass"><br>
+            </span>
+
+            <input class="button" type="submit" value="Setup">
+        </form>
+    </div>
+
+    <script>
+        function showSuccess(image) {
+            const div = document.createElement("div");
+            div.classList.add("content")
+            div.classList.add("success")
+
+            div.appendChild(image);
+
+            const headline = document.createElement("h2")
+            headline.innerText = "Success";
+            div.appendChild(headline);
+
+            const span = document.createElement("span");
+            span.innerText = "The Spoddify Mopped remote restarts now. \n Check out the display for futher instructions."
+
+            div.appendChild(span);
+            return div;
+        }
+
+        function submit(event) {
+            event.preventDefault();
+
+            const image = new Image();
+            image.className = "success";
+            image.onload = function () {
+
+                const request = new XMLHttpRequest();
+                request.open('POST', "/", true);
+
+                request.onload = function () {
+                    document.body.replaceChildren(showSuccess(image))
+                };
+
+                request.onerror = function () {
+                };
+
+                request.send(new FormData(event.target));
+            }
+            image.src = "/success.png";
+        }
+
+        document.querySelector("#setup").addEventListener("submit", submit)
+    </script>
+</body>
+
+</html>
