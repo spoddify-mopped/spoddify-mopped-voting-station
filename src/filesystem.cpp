@@ -1,55 +1,54 @@
+/**
+ * Filesystem manager
+ */
+
 #include "filesystem.h"
 
-#include "SPIFFS.h"
 #include <SD.h>
 
-void FilesystemClass::init()
-{
-    if (!SPIFFS.begin(true))
-    {
-        Serial.println("An error has occurred while mounting SPIFFS");
-    }
-    Serial.println("SPIFFS mounted successfully");
+#include "SPIFFS.h"
+
+/**
+ * Initalizes the SPIFFS filesystem.
+ */
+bool FilesystemClass::init() {
+    return SPIFFS.begin(true);
 }
 
-String FilesystemClass::readFile(fs::FS &fs, const char *path)
-{
-    Serial.printf("Reading file: %s\r\n", path);
-
-    File file = fs.open(path);
-    if (!file || file.isDirectory())
-    {
-        Serial.println("- failed to open file for reading");
+/**
+ * Read a file from SPIFFS.
+ */
+String FilesystemClass::readFile(const char *path) {
+    File file = SPIFFS.open(path);
+    if (!file || file.isDirectory()) {
         return String();
     }
 
     String fileContent;
-    while (file.available())
-    {
+    while (file.available()) {
         fileContent = file.readStringUntil('\n');
         break;
     }
     return fileContent;
 }
 
-void FilesystemClass::writeFile(fs::FS &fs, const char *path, const char *message)
-{
-    Serial.printf("Writing file: %s\r\n", path);
+/**
+ * Removes a file from SPIFFS.
+ */
+bool FilesystemClass::removeFile(const char *path) {
+    return SPIFFS.remove(path);
+}
 
-    File file = fs.open(path, FILE_WRITE);
-    if (!file)
-    {
-        Serial.println("- failed to open file for writing");
-        return;
+/**
+ * Write a file to SPIFFS.
+ */
+bool FilesystemClass::writeFile(const char *path, const char *content) {
+    File file = SPIFFS.open(path, FILE_WRITE);
+    if (!file) {
+        return false;
     }
-    if (file.print(message))
-    {
-        Serial.println("- file written");
-    }
-    else
-    {
-        Serial.println("- frite failed");
-    }
+    
+    return file.print(content);
 }
 
 FilesystemClass Filesystem;
