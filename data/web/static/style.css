@@ -59,7 +59,7 @@ form.form-container {
 }
 
 input.button {
-  background-color: #1ed760;
+  background-color: #15bb4f;
   color: #121212;
   padding: 0.5rem;
   border-radius: 15px;
@@ -68,8 +68,24 @@ input.button {
   height: 2rem;
 }
 
+input.button.red {
+  background-color: rgb(190, 0, 0);
+}
+
+input.button.red:hover {
+  background-color: red;
+}
+
 input.button:hover {
-  background-color: #28ff73;
+  background-color: #1ed760;
+}
+
+input.button.blue {
+  background-color: #1658b4;
+}
+
+input.button.blue:hover {
+  background-color: #1b65cc;
 }
 
 div.success {

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Spoddify Mopped Remote</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/static/style.css">
+    <link rel="stylesheet" type="text/css" href="/static/settings.css">
+    <script src="/static/wifi.js"></script>
+</head>
+
+<body>
+    <div class="settings">
+        <img class="settings" src="static/logo.png" alt="Spoddify Mopped" />
+        <h2>Wi-Fi</h2>
+
+        <form id="wifi-update" class="form-container">
+            <span class="input-container">
+                <label for="ssid">SSID</label>
+                <input type="text" id="ssid" name="ssid" value="%SSID_PLACEHOLDER%"><br>
+            </span>
+            <span class="input-container">
+                <label for="pass">Password</label>
+                <input type="password" id="pass" name="pass"><br>
+            </span>
+
+            <input class="button blue" type="submit" value="Update">
+        </form>
+
+        <h2>System</h2>
+        <div class="system">
+            <input class="button" type="submit" value="Restart" onclick="restart()">
+            <input class="button red" type="submit" value="Reset" onclick="reset()">
+        </div>
+    </div>
+
+    <script>
+        document.querySelector("#wifi-update").addEventListener("submit", updateWifi)
+    </script>
+</body>
+
+</html>
