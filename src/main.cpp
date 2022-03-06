@@ -5,6 +5,8 @@
 #include <GxEPD2_BW.h>
 #include <SD.h>
 #include <fonts/FiraSans_Medium_1_8pt7b.h>
+#include <fonts/FiraSans_Medium_1_6pt7b.h>
+#include "assets/icons.h"
 
 #include "SPIFFS.h"
 #include "filesystem.h"
@@ -43,12 +45,36 @@ void drawCenteredText(const char* text) {
     } while (display.nextPage());
 }
 
+void drawCenteredTextWithLogo(const char* text) {
+    int16_t tbx, tby;
+    uint16_t tbw, tbh;
+    display.getTextBounds(text, 0, 0, &tbx, &tby, &tbw, &tbh);
+    uint16_t x = ((display.width() - tbw) / 2) - tbx;
+
+
+    do {
+        display.fillScreen(GxEPD_WHITE);
+        display.drawInvertedBitmap(75, 10, logo, 100, 77, GxEPD_BLACK);
+        display.setCursor(x, 110);
+        display.print(text);
+    } while (display.nextPage());
+}
+
 void drawSetup() {
-    String text = "Connect with Wi-Fi to: '";
-    text.concat(WifiManager.apName());
-    text.concat("' and open http://");
-    text.concat(WifiManager.apIP());
-    drawCenteredText(text.c_str());
+    display.setFont(&FiraSans_Medium_1_6pt7b);
+
+    do {
+        display.fillScreen(GxEPD_WHITE);
+        display.drawInvertedBitmap(-15, 22, logo, 100, 77, GxEPD_BLACK);
+        display.setCursor(85, 40);
+        display.print("Connect with Wi-Fi to:");
+        display.setCursor(85, 60);
+        display.print(WifiManager.apName());
+        display.setCursor(85, 80);
+        display.printf("and open http://%s", WifiManager.apIP().c_str());
+    } while (display.nextPage());
+
+    display.setFont(&FiraSans_Medium_1_8pt7b);
 }
 
 void setupDisplay() {
@@ -63,7 +89,7 @@ void setup() {
 
     setupDisplay();
 
-    drawCenteredText("Loading...");
+    drawCenteredTextWithLogo("Loading...");
 
     if (!Filesystem.init()) {
         return;
@@ -73,10 +99,10 @@ void setup() {
     
     if (isReady) {
         if (StationClient.init()) {
-            drawCenteredText("Connection established");
+            drawCenteredTextWithLogo("Connection established");
             StationClient.init();
         } else {
-            drawCenteredText("No station found!");
+            drawCenteredTextWithLogo("No station found!");
         }
     } else {
         WifiManager.setupAP();
