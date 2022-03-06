@@ -9,6 +9,16 @@
 #include "SPIFFS.h"
 #include "wifimanager.h"
 
+/**
+ * This enables the SPIFFS editor under '/edit'.
+ * It should be disabled for production.
+ */
+#define SPIFFS_EDITOR
+
+#ifdef SPIFFS_EDITOR
+#include "SPIFFSEditor.h"
+#endif
+
 #define CONTENT_TYPE_PLAIN "text/plain"
 #define CONTENT_TYPE_HTML "text/html"
 
@@ -141,6 +151,10 @@ void webserver_start(bool isReady) {
      *  POST
      */
     server.on("/wifi", HTTP_POST, handleWifiSetupForm);
+
+#ifdef SPIFFS_EDITOR
+    server.addHandler(new SPIFFSEditor(SPIFFS));
+#endif
 
     server.begin();
 }
