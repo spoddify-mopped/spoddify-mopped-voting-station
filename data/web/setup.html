@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Wi-Fi Setup</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <script src="js/wifi.js"></script>
+</head>
+
+<body>
+    <div class="content">
+        <img src="images/logo.png" alt="Spoddify Mopped" />
+        <h2>Wi-Fi Setup</h2>
+        <form id="setup" class="form-container">
+            <span class="input-container">
+                <label for="ssid">SSID</label>
+                <input type="text" id="ssid" name="ssid" required><br>
+            </span>
+            <span class="input-container">
+                <label for="pass">Password</label>
+                <input type="password" id="pass" name="pass"><br>
+            </span>
+
+            <input class="button outlined" type="submit" value="Setup">
+        </form>
+    </div>
+
+    <script>
+        document.querySelector("#setup").addEventListener("submit", updateWifi)
+    </script>
+</body>
+
+</html>

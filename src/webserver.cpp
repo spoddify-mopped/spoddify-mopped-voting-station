@@ -22,8 +22,8 @@
 #define CONTENT_TYPE_PLAIN "text/plain"
 #define CONTENT_TYPE_HTML "text/html"
 
-#define STATIC_URL_PATH "/static"
-#define STATIC_FILES_PATH "/web/static"
+#define STATIC_URL_PATH "/"
+#define STATIC_FILES_PATH "/web/"
 
 AsyncWebServer server(80);
 
@@ -31,7 +31,7 @@ AsyncWebServer server(80);
  * Handles request to show the wifi setup page.
  */
 void handleWifiSetupPage(AsyncWebServerRequest *request) {
-    request->send(SPIFFS, "/web/setup/setup.html", CONTENT_TYPE_HTML);
+    request->send(SPIFFS, "/web/setup.html", CONTENT_TYPE_HTML);
 }
 
 /**
@@ -107,8 +107,6 @@ void initalizeRoutes() {
  * Handles request to setup or update the wifi credentials.
  */
 void handleWifiSetupForm(AsyncWebServerRequest *request) {
-    int paramsSize = request->params();
-
     String ssid = "";
     String pass = "";
     int resultStatus = 400;
