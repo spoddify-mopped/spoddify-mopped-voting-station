@@ -1,38 +1,37 @@
 <!DOCTYPE html>
 <html>
-
-<head>
+  <head>
     <title>Wi-Fi Setup</title>
     <meta charset="UTF-8" />
     <link rel="icon" href="favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <link rel="stylesheet" type="text/css" href="css/style.css" />
-    
+
     <script src="js/wifi.js"></script>
-</head>
+  </head>
 
-<body>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
     <div class="content">
-        <img src="images/logo.png" alt="Spoddify Mopped" />
-        <h2>Wi-Fi Setup</h2>
-        <form id="setup" class="form-container">
-            <span class="input-container">
-                <label for="ssid">SSID</label>
-                <input type="text" id="ssid" name="ssid" required><br>
-            </span>
-            <span class="input-container">
-                <label for="pass">Password</label>
-                <input type="password" id="pass" name="pass"><br>
-            </span>
+      <img src="images/logo.png" alt="Spoddify Mopped" />
+      <h2>Wi-Fi Setup</h2>
+      <form id="setup" class="form-container">
+        <span class="input-container">
+          <label for="ssid">SSID</label>
+          <input type="text" id="ssid" name="ssid" required /><br />
+        </span>
+        <span class="input-container">
+          <label for="pass">Password</label>
+          <input type="password" id="pass" name="pass" /><br />
+        </span>
 
-            <input class="button outlined" type="submit" value="Setup">
-        </form>
+        <input class="button outlined" type="submit" value="Setup" />
+      </form>
     </div>
 
     <script>
-        document.querySelector("#setup").addEventListener("submit", updateWifi)
+      document.querySelector("#setup").addEventListener("submit", updateWifi);
     </script>
-</body>
-
+  </body>
 </html>

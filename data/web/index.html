@@ -1,46 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <title>Spoddify Mopped Remote</title>
     <meta charset="UTF-8" />
     <link rel="icon" href="favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <link rel="stylesheet" type="text/css" href="css/style.css" />
-    <link rel="stylesheet" type="text/css" href="css/settings.css"/>
-    
+    <link rel="stylesheet" type="text/css" href="css/settings.css" />
+
     <script src="js/wifi.js"></script>
-</head>
+  </head>
 
-<body>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
     <div class="settings">
-        <img class="settings" src="images/logo.png" alt="Spoddify Mopped" />
-        <h2>Wi-Fi</h2>
+      <img class="settings" src="images/logo.png" alt="Spoddify Mopped" />
+      <h2>Wi-Fi</h2>
 
-        <form id="wifi-update" class="form-container">
-            <span class="input-container">
-                <label for="ssid">SSID</label>
-                <input type="text" id="ssid" name="ssid" value="%SSID_PLACEHOLDER%" required><br>
-            </span>
-            <span class="input-container">
-                <label for="pass">Password</label>
-                <input type="password" id="pass" name="pass"><br>
-            </span>
+      <form id="wifi-update" class="form-container">
+        <span class="input-container">
+          <label for="ssid">SSID</label>
+          <input
+            type="text"
+            id="ssid"
+            name="ssid"
+            value="%SSID_PLACEHOLDER%"
+            required
+          /><br />
+        </span>
+        <span class="input-container">
+          <label for="pass">Password</label>
+          <input type="password" id="pass" name="pass" /><br />
+        </span>
 
-            <input class="button outlined" type="submit" value="Update">
-        </form>
+        <input class="button outlined" type="submit" value="Update" />
+      </form>
 
-        <h2>System</h2>
-        <div class="system">
-            <input class="button outlined" type="submit" value="Restart" onclick="restart()">
-            <input class="button outlined" type="submit" value="Reset" onclick="reset()">
-        </div>
+      <h2>System</h2>
+      <div class="system">
+        <input
+          class="button outlined"
+          type="submit"
+          value="Restart"
+          onclick="restart()"
+        />
+        <input
+          class="button outlined"
+          type="submit"
+          value="Reset"
+          onclick="reset()"
+        />
+      </div>
     </div>
 
     <script>
-        document.querySelector("#wifi-update").addEventListener("submit", updateWifi)
+      document
+        .querySelector("#wifi-update")
+        .addEventListener("submit", updateWifi);
     </script>
-</body>
-
+  </body>
 </html>
