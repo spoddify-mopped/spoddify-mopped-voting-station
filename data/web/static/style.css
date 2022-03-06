@@ -68,24 +68,19 @@ input.button {
   height: 2rem;
 }
 
-input.button.red {
-  background-color: rgb(190, 0, 0);
+input.button.outlined {
+  background-color: transparent;
+  border: 1px solid #15bb4f;
+  color: #15bb4f;
 }
 
-input.button.red:hover {
-  background-color: red;
+input.button.outlined:hover {
+  color: #121212;
+  background-color: #15bb4f;
 }
 
 input.button:hover {
   background-color: #1ed760;
-}
-
-input.button.blue {
-  background-color: #1658b4;
-}
-
-input.button.blue:hover {
-  background-color: #1b65cc;
 }
 
 div.success {
