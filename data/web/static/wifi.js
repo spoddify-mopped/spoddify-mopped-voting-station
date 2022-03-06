@@ -39,6 +39,11 @@ function formPost(path, event) {
 
 function updateWifi(event) {
     event.preventDefault();
+    
+    if (!event.target[1].value && !confirm("Do you want to proceed with an empty password?")) {
+      return;
+    }
+    
     formPost("/wifi", event)
 }
 
