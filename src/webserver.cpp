@@ -109,19 +109,30 @@ void initalizeRoutes() {
 void handleWifiSetupForm(AsyncWebServerRequest *request) {
     int paramsSize = request->params();
 
-    for (int i = 0; i < paramsSize; i++) {
-        AsyncWebParameter *param = request->getParam(i);
-        if (param->isPost()) {
-            if (param->name() == "ssid") {
-                WifiManager.saveSSID(param->value().c_str());
-            }
-            if (param->name() == "pass") {
-                WifiManager.savePassword(param->value().c_str());
-            }
-        }
+    String ssid = "";
+    String pass = "";
+    int resultStatus = 400;
+
+    if (request->hasParam("ssid", true) && request->hasParam("pass", true)) {
+        ssid = request->getParam("ssid", true)->value();
+        pass = request->getParam("pass", true)->value();
     }
 
+    if (!ssid.isEmpty()) {
+        resultStatus = 200;
+    }
+
+    if (resultStatus == 400) {
+        request->send(resultStatus, F(CONTENT_TYPE_PLAIN),
+                      F("Bad request"));
+        return;
+    }
+
+    WifiManager.saveSSID(ssid.c_str());
+    WifiManager.savePassword(pass.c_str());
+
     request->send(204, CONTENT_TYPE_PLAIN, "");
+
     delay(1000);
     ESP.restart();
 }
