@@ -8,6 +8,7 @@
 
 #include "SPIFFS.h"
 #include "wifimanager.h"
+#include "station.h"
 
 /**
  * This enables the SPIFFS editor under '/edit'.
@@ -52,8 +53,12 @@ String settingsPageProcessor(const String &p) {
         return WifiManager.SSID();
     }
 
-    if (p == "IP_PLACEHOLDER") {
-        return WifiManager.IP();
+    if (p == "CONNECTION_STATUS") {
+        return StationClient.isConnected() ? "Connected" : "Unconnected";
+    }
+
+    if (p == "STATION_HOST") {
+        return StationClient.getStationHost();
     }
 
     return String();

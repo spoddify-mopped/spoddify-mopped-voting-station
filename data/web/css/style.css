@@ -13,6 +13,15 @@ body {
   height: 100%;
 }
 
+a {
+  color: #c1c1c1;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
 img {
   width: 32rem;
   margin-bottom: 2rem;

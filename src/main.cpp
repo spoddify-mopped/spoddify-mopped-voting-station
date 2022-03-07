@@ -100,7 +100,6 @@ void setup() {
     if (isReady) {
         if (StationClient.init()) {
             drawCenteredTextWithLogo("Connection established");
-            StationClient.init();
         } else {
             drawCenteredTextWithLogo("No station found!");
         }

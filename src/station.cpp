@@ -27,6 +27,7 @@ HTTPClient http;
 String host;
 u16_t port;
 
+bool connected = false;
 /**
  * Fetches the stations player state. 
  */
@@ -100,14 +101,31 @@ bool searchStation() {
  * Discovery of the station and socket.io connetion.
  */
 bool StationClientClass::init() {
-    if (!searchStation()) {
-        return false;
+    if (searchStation()) {
+        socketIO.begin(host, port, SOCKET_IO_PATH);
+        socketIO.onEvent(handleEvent);
+        connected = true;
     }
 
-    socketIO.begin(host, port, SOCKET_IO_PATH);
-    socketIO.onEvent(handleEvent);
+    return connected;
+}
 
-    return true;
+/**
+ * Determine wheather the client is connected or not. 
+ */
+bool StationClientClass::isConnected() {
+    return connected;
+}
+
+/**
+ * Get the host of the station.
+ */
+String StationClientClass::getStationHost() {
+    if (host.isEmpty() || port == 0) {
+        return "";
+    }
+
+    return "http://" + host + ":" + port;
 }
 
 /**
