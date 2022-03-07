@@ -13,7 +13,6 @@
 #include <SocketIOclient.h>
 
 #include <ArduinoJson.h>
-#include <HTTPClient.h>
 #include <ESPmDNS.h>
 
 #define MDNS_QUERY_TYPE "http"
@@ -38,24 +37,19 @@ PlayerEventCallback playerEventCallback;
 bool connected = false;
 
 /**
- * Fetches the stations player state. 
+ * Requests a player event.
  */
 void getPlayer() {
-    String url = "http://" + host + ":" + port + "/api/player";
+    DynamicJsonDocument doc(1024);
+    JsonArray array = doc.to<JsonArray>();
+    array.add("action");
 
-    http.begin(url.c_str());
-    int httpResponseCode = http.GET();
+    JsonObject event = array.createNestedObject();
+    event["type"] = "WS_TO_SERVER_GET_PLAYER_STATE";
 
-    if (httpResponseCode > 0) {
-        Serial.print("HTTP Response code: ");
-        Serial.println(httpResponseCode);
-        String payload = http.getString();
-        Serial.println(payload);
-    } else {
-        Serial.print("Error code: ");
-        Serial.println(httpResponseCode);
-    }
-    http.end();
+    String raw;
+    serializeJson(doc, raw);
+    socketIO.sendEVENT(raw);
 }
 
 /**
@@ -79,12 +73,13 @@ void handleEvent(socketIOmessageType_t type, uint8_t* payload, size_t length) {
             if (!connected) {
                 connected = true;
                 connectionChangedCallback(connected);
+                getPlayer();
             }
             break;
         case sIOtype_EVENT: {
             DynamicJsonDocument doc(1024);
             DeserializationError error = deserializeJson(doc, payload, length);
-            if(error) {
+            if (error) {
                 Serial.print(F("deserializeJson() failed: "));
                 Serial.println(error.c_str());
                 return;
@@ -96,9 +91,10 @@ void handleEvent(socketIOmessageType_t type, uint8_t* payload, size_t length) {
                 String eventType = doc[1]["type"];
                 if (eventType == "WS_TO_CLIENT_SET_PLAYER_STATE") {
                     String pTrack = doc[1]["payload"]["item"]["name"];
-                    String pArtist = doc[1]["payload"]["item"]["artists"][0]["name"];
+                    String pArtist =
+                        doc[1]["payload"]["item"]["artists"][0]["name"];
                     String pAlbum = doc[1]["payload"]["item"]["album"]["name"];
-                    
+
                     bool changed = false;
 
                     if (pTrack != "null" && pTrack != track) {
@@ -122,10 +118,10 @@ void handleEvent(socketIOmessageType_t type, uint8_t* payload, size_t length) {
                 }
             }
 
-            
             break;
         }
-        default: {}
+        default: {
+        }
     }
 }
 
@@ -170,7 +166,8 @@ void StationClientClass::init() {
 /**
  * Adds the connection changed handler.
  */
-void StationClientClass::addConnectionChangedHandler(ConnectionChangedCallback callback) {
+void StationClientClass::addConnectionChangedHandler(
+    ConnectionChangedCallback callback) {
     connectionChangedCallback = callback;
 }
 
@@ -182,11 +179,9 @@ void StationClientClass::addPlayerEventHandler(PlayerEventCallback callback) {
 }
 
 /**
- * Determine wheather the client is connected or not. 
+ * Determine wheather the client is connected or not.
  */
-bool StationClientClass::isConnected() {
-    return connected;
-}
+bool StationClientClass::isConnected() { return connected; }
 
 /**
  * Get the host of the station.
