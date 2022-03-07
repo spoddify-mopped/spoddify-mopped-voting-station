@@ -15,8 +15,7 @@ class WifiManagerClass {
     static void setupAP();
     static String apName();
     static String apIP();
-    static void saveSSID(String ssid);
-    static void savePassword(String password);
+    static void saveCredentials(String ssid, String password);
     static void reset();
 };
 

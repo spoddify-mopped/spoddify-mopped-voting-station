@@ -11,9 +11,7 @@
 /**
  * Initalizes the SPIFFS filesystem.
  */
-bool FilesystemClass::init() {
-    return SPIFFS.begin(true);
-}
+bool FilesystemClass::init() { return SPIFFS.begin(true); }
 
 /**
  * Read a file from SPIFFS.
@@ -47,7 +45,7 @@ bool FilesystemClass::writeFile(const char *path, const char *content) {
     if (!file) {
         return false;
     }
-    
+
     return file.print(content);
 }
 

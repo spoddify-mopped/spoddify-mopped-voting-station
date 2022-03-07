@@ -4,6 +4,7 @@
 
 #include "wifimanager.h"
 
+#include <ArduinoJson.h>
 #include <WiFi.h>
 
 #include "filesystem.h"
@@ -13,8 +14,7 @@
 
 #define WIFI_CONNECT_TIMEOUT 10000
 
-#define SSID_PATH "/ssid.txt"
-#define PASS_PATH "/pass.txt"
+#define CREDENTIALS_PATH "/settings.json"
 
 /**
  * Returns the SSID of the connected WiFi network.
@@ -30,8 +30,13 @@ String WifiManagerClass::IP() { return WiFi.localIP().toString(); }
  * Connects to the the stored WiFi network.
  */
 bool WifiManagerClass::connect() {
-    String ssid = Filesystem.readFile(SSID_PATH);
-    String password = Filesystem.readFile(PASS_PATH);
+    String credentialsRaw = Filesystem.readFile(CREDENTIALS_PATH);
+
+    DynamicJsonDocument doc(1024);
+    deserializeJson(doc, credentialsRaw);
+
+    String ssid = doc["ssid"];
+    String password = doc["pass"];
 
     if (ssid.isEmpty()) {
         return false;
@@ -71,17 +76,18 @@ void WifiManagerClass::setupAP() { WiFi.softAP(apName().c_str(), AP_PW); }
 String WifiManagerClass::apIP() { return WiFi.softAPIP().toString(); }
 
 /**
- * Saves the given ssid in the filesystem.
+ * Saves the given wifi credentials in the filesystem.
  */
-void WifiManagerClass::saveSSID(String ssid) {
-    Filesystem.writeFile(SSID_PATH, ssid.c_str());
-}
+void WifiManagerClass::saveCredentials(String ssid, String password) {
+    DynamicJsonDocument doc(1024);
 
-/**
- * Saves the given password in the filesystem.
- */
-void WifiManagerClass::savePassword(String password) {
-    Filesystem.writeFile(PASS_PATH, password.c_str());
+    doc["ssid"] = ssid;
+    doc["pass"] = password;
+
+    String raw;
+    serializeJson(doc, raw);
+
+    Filesystem.writeFile(CREDENTIALS_PATH, raw.c_str());
 }
 
 /**

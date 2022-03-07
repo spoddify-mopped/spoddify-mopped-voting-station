@@ -7,8 +7,8 @@
 #include <ESPAsyncWebServer.h>
 
 #include "SPIFFS.h"
-#include "wifimanager.h"
 #include "station.h"
+#include "wifimanager.h"
 
 /**
  * This enables the SPIFFS editor under '/edit'.
@@ -126,14 +126,11 @@ void handleWifiSetupForm(AsyncWebServerRequest *request) {
     }
 
     if (resultStatus == 400) {
-        request->send(resultStatus, F(CONTENT_TYPE_PLAIN),
-                      F("Bad request"));
+        request->send(resultStatus, F(CONTENT_TYPE_PLAIN), F("Bad request"));
         return;
     }
 
-    WifiManager.saveSSID(ssid.c_str());
-    WifiManager.savePassword(pass.c_str());
-
+    WifiManager.saveCredentials(ssid, pass);
     request->send(204, CONTENT_TYPE_PLAIN, "");
 
     delay(1000);

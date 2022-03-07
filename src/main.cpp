@@ -121,9 +121,10 @@ void setup() {
             }
         });
 
-        StationClient.addPlayerEventHandler([](String track, String artist, String album) {
-            drawSongInfos(track, artist, album);
-        });
+        StationClient.addPlayerEventHandler(
+            [](String track, String artist, String album) {
+                drawSongInfos(track, artist, album);
+            });
 
         StationClient.init();
     } else {
