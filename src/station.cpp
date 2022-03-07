@@ -22,7 +22,6 @@
 #define SOCKET_IO_PATH "/socket.io/?EIO=4"
 
 SocketIOclient socketIO;
-HTTPClient http;
 
 String host = "";
 u16_t port = 0;
