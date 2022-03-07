@@ -12,6 +12,7 @@
 #include <WebSocketsClient.h>
 #include <SocketIOclient.h>
 
+#include <ArduinoJson.h>
 #include <HTTPClient.h>
 #include <ESPmDNS.h>
 
@@ -24,10 +25,18 @@
 SocketIOclient socketIO;
 HTTPClient http;
 
-String host;
-u16_t port;
+String host = "";
+u16_t port = 0;
+
+String track = "";
+String artist = "";
+String album = "";
+
+ConnectionChangedCallback connectionChangedCallback;
+PlayerEventCallback playerEventCallback;
 
 bool connected = false;
+
 /**
  * Fetches the stations player state. 
  */
@@ -56,15 +65,64 @@ void handleEvent(socketIOmessageType_t type, uint8_t* payload, size_t length) {
     switch (type) {
         case sIOtype_DISCONNECT:
             Serial.printf("[Socket.io] Disconnected!\n");
+
+            if (connected) {
+                connected = false;
+                connectionChangedCallback(connected);
+            }
+
             break;
         case sIOtype_CONNECT:
             Serial.printf("[Socket.io] Connected to url: %s\n", payload);
             socketIO.send(sIOtype_CONNECT, "/");
+
+            if (!connected) {
+                connected = true;
+                connectionChangedCallback(connected);
+            }
             break;
         case sIOtype_EVENT: {
-            char* sptr = NULL;
-            int id = strtol((char*)payload, &sptr, 10);
-            Serial.printf("[IOc] get event: %s id: %d\n", payload, id);
+            DynamicJsonDocument doc(1024);
+            DeserializationError error = deserializeJson(doc, payload, length);
+            if(error) {
+                Serial.print(F("deserializeJson() failed: "));
+                Serial.println(error.c_str());
+                return;
+            }
+
+            String eventName = doc[0];
+
+            if (eventName == "action") {
+                String eventType = doc[1]["type"];
+                if (eventType == "WS_TO_CLIENT_SET_PLAYER_STATE") {
+                    String pTrack = doc[1]["payload"]["item"]["name"];
+                    String pArtist = doc[1]["payload"]["item"]["artists"][0]["name"];
+                    String pAlbum = doc[1]["payload"]["item"]["album"]["name"];
+                    
+                    bool changed = false;
+
+                    if (pTrack != "null" && pTrack != track) {
+                        track = pTrack;
+                        changed = true;
+                    }
+
+                    if (pArtist != "null" && pArtist != artist) {
+                        artist = pArtist;
+                        changed = true;
+                    }
+
+                    if (pAlbum != "null" && pAlbum != album) {
+                        album = pAlbum;
+                        changed = true;
+                    }
+
+                    if (changed) {
+                        playerEventCallback(track, artist, album);
+                    }
+                }
+            }
+
+            
             break;
         }
         default: {}
@@ -100,14 +158,27 @@ bool searchStation() {
  * Initalizes the station client.
  * Discovery of the station and socket.io connetion.
  */
-bool StationClientClass::init() {
+void StationClientClass::init() {
     if (searchStation()) {
         socketIO.begin(host, port, SOCKET_IO_PATH);
         socketIO.onEvent(handleEvent);
-        connected = true;
+    } else {
+        connectionChangedCallback(connected);
     }
+}
 
-    return connected;
+/**
+ * Adds the connection changed handler.
+ */
+void StationClientClass::addConnectionChangedHandler(ConnectionChangedCallback callback) {
+    connectionChangedCallback = callback;
+}
+
+/**
+ * Adds the player event handler.
+ */
+void StationClientClass::addPlayerEventHandler(PlayerEventCallback callback) {
+    playerEventCallback = callback;
 }
 
 /**

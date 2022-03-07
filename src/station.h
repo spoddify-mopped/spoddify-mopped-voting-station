@@ -7,9 +7,15 @@
 
 #include <WString.h>
 
+typedef void (*PlayerEventCallback)(String track, String artist, String album);
+
+typedef void (*ConnectionChangedCallback)(bool connected);
+
 class StationClientClass {
    public:
-    static bool init();
+    static void init();
+    static void addConnectionChangedHandler(ConnectionChangedCallback callback);
+    static void addPlayerEventHandler(PlayerEventCallback callback);
     static bool isConnected();
     static String getStationHost();
     static void loop();

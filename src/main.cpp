@@ -4,11 +4,11 @@
 
 #include <GxEPD2_BW.h>
 #include <SD.h>
-#include <fonts/FiraSans_Medium_1_8pt7b.h>
 #include <fonts/FiraSans_Medium_1_6pt7b.h>
-#include "assets/icons.h"
+#include <fonts/FiraSans_Medium_1_8pt7b.h>
 
 #include "SPIFFS.h"
+#include "assets/icons.h"
 #include "filesystem.h"
 #include "station.h"
 #include "webserver.h"
@@ -51,7 +51,6 @@ void drawCenteredTextWithLogo(const char* text) {
     display.getTextBounds(text, 0, 0, &tbx, &tby, &tbw, &tbh);
     uint16_t x = ((display.width() - tbw) / 2) - tbx;
 
-
     do {
         display.fillScreen(GxEPD_WHITE);
         display.drawInvertedBitmap(75, 10, logo, 100, 77, GxEPD_BLACK);
@@ -84,6 +83,22 @@ void setupDisplay() {
     display.setTextColor(GxEPD_BLACK);
 }
 
+void drawSongInfos(String songName, String artistName, String albumName) {
+    display.firstPage();
+    do {
+        display.fillScreen(GxEPD_WHITE);
+        display.drawInvertedBitmap(0, 4, icon_title, 18, 18, GxEPD_BLACK);
+        display.drawInvertedBitmap(0, 22, icon_album, 18, 18, GxEPD_BLACK);
+        display.drawInvertedBitmap(0, 40, icon_artist, 18, 18, GxEPD_BLACK);
+        display.setCursor(18, 18);
+        display.print(songName.c_str());
+        display.setCursor(18, 36);
+        display.print(artistName.c_str());
+        display.setCursor(18, 54);
+        display.print(albumName.c_str());
+    } while (display.nextPage());
+}
+
 void setup() {
     Serial.begin(115200);
 
@@ -96,13 +111,21 @@ void setup() {
     }
 
     bool isReady = WifiManager.connect();
-    
+
     if (isReady) {
-        if (StationClient.init()) {
-            drawCenteredTextWithLogo("Connection established");
-        } else {
-            drawCenteredTextWithLogo("No station found!");
-        }
+        StationClient.addConnectionChangedHandler([](bool connected) {
+            if (connected) {
+                drawCenteredTextWithLogo("Connection established");
+            } else {
+                drawCenteredTextWithLogo("No station found!");
+            }
+        });
+
+        StationClient.addPlayerEventHandler([](String track, String artist, String album) {
+            drawSongInfos(track, artist, album);
+        });
+
+        StationClient.init();
     } else {
         WifiManager.setupAP();
         drawSetup();
