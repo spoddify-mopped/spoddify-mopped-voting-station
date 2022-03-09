@@ -135,4 +135,11 @@ void setup() {
     webserver_start(isReady);
 }
 
-void loop() { StationClient.loop(); }
+void loop() {
+    if (restartTime > 0 && millis() >= restartTime) {
+        restartTime = 0;
+        ESP.restart();
+    }
+
+    StationClient.loop();
+}

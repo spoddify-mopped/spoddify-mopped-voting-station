@@ -28,6 +28,10 @@
 
 AsyncWebServer server(80);
 
+uint32_t restartTime = 0;
+
+void restart() { restartTime = millis() + 100; }
+
 /**
  * Handles request to show the wifi setup page.
  */
@@ -76,9 +80,9 @@ void handleSettingsPage(AsyncWebServerRequest *request) {
  * Handles request restart the esp.
  */
 void handleRestart(AsyncWebServerRequest *request) {
+    restart();
+
     request->send(204, CONTENT_TYPE_PLAIN, "");
-    delay(1000);
-    ESP.restart();
 }
 
 /**
@@ -86,10 +90,9 @@ void handleRestart(AsyncWebServerRequest *request) {
  */
 void handleReset(AsyncWebServerRequest *request) {
     WifiManager.reset();
+    restart();
 
     request->send(204, CONTENT_TYPE_PLAIN, "");
-    delay(1000);
-    ESP.restart();
 }
 
 /**
@@ -131,10 +134,9 @@ void handleWifiSetupForm(AsyncWebServerRequest *request) {
     }
 
     WifiManager.saveCredentials(ssid, pass);
-    request->send(204, CONTENT_TYPE_PLAIN, "");
+    restart();
 
-    delay(1000);
-    ESP.restart();
+    request->send(204, CONTENT_TYPE_PLAIN, "");
 }
 
 /**
