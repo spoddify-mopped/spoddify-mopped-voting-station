@@ -94,8 +94,7 @@ void WifiManagerClass::saveCredentials(String ssid, String password) {
  * Saves the given password in the filesystem.
  */
 void WifiManagerClass::reset() {
-    Filesystem.removeFile(PASS_PATH);
-    Filesystem.removeFile(SSID_PATH);
+    Filesystem.removeFile(CREDENTIALS_PATH);
 }
 
 WifiManagerClass WifiManager;
