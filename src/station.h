@@ -7,7 +7,7 @@
 
 #include <WString.h>
 
-typedef void (*PlayerEventCallback)(String track, String artist, String album);
+typedef void (*PlayerEventCallback)(String track, String artist, String album, float heights[23]);
 
 typedef void (*ConnectionChangedCallback)(bool connected);
 

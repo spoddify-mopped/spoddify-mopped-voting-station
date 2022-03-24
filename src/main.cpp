@@ -83,7 +83,7 @@ void setupDisplay() {
     display.setTextColor(GxEPD_BLACK);
 }
 
-void drawSongInfos(String songName, String artistName, String albumName) {
+void drawSongInfos(String songName, String artistName, String albumName, float heights[23]) {
     display.firstPage();
     do {
         display.fillScreen(GxEPD_WHITE);
@@ -96,6 +96,10 @@ void drawSongInfos(String songName, String artistName, String albumName) {
         display.print(artistName.c_str());
         display.setCursor(18, 54);
         display.print(albumName.c_str());
+        display.drawInvertedBitmap(5, 76, icon_spotify, 40, 40, GxEPD_BLACK);
+        for (int i = 0; i < 23; i++) {
+            display.fillRect(55+i*8, 95-(heights[i]) / 20.0 * 4, 5, (heights[i]) / 20.0 * 8.1, GxEPD_BLACK);
+        }
     } while (display.nextPage());
 }
 
@@ -122,8 +126,8 @@ void setup() {
         });
 
         StationClient.addPlayerEventHandler(
-            [](String track, String artist, String album) {
-                drawSongInfos(track, artist, album);
+            [](String track, String artist, String album, float heights[23]) {
+                drawSongInfos(track, artist, album, heights);
             });
 
         StationClient.init();

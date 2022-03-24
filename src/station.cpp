@@ -29,6 +29,7 @@ u16_t port = 0;
 String track = "";
 String artist = "";
 String album = "";
+float heights[23];
 
 ConnectionChangedCallback connectionChangedCallback;
 PlayerEventCallback playerEventCallback;
@@ -111,8 +112,12 @@ void handleEvent(socketIOmessageType_t type, uint8_t* payload, size_t length) {
                         changed = true;
                     }
 
+                    for (int i = 0; i < 23; i++) {
+                        heights[i] = doc[1]["payload"]["heights"][i];
+                    }
+
                     if (changed) {
-                        playerEventCallback(track, artist, album);
+                        playerEventCallback(track, artist, album, heights);
                     }
                 }
             }
