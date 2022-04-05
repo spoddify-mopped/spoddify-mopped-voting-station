@@ -18,6 +18,7 @@ class StationClientClass {
     static void addPlayerEventHandler(PlayerEventCallback callback);
     static bool isConnected();
     static String getStationHost();
+    static uint16_t getStationPort();
     static void loop();
 };
 

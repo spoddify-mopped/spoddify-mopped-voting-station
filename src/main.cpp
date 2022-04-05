@@ -14,6 +14,8 @@
 #include "webserver.h"
 #include "wifimanager.h"
 
+#include <WiFi.h>
+
 /**
  * Display configuration
  */
@@ -22,12 +24,18 @@
 #define GxEPD2_DRIVER_CLASS GxEPD2_213_B74
 #define GxEPD2_BW_IS_GxEPD2_BW true
 
+#define SKIP_BUTTON 21
+#define LIKE_BUTTON 26
+
 GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> display(GxEPD2_213_B74(
     /*CS=5*/ 5, /*DC=*/17, /*RST=*/16, /*BUSY=*/4));  // GxEPD2_213_B74
 #define MAX_HEIGHT(EPD)                                        \
     (EPD::HEIGHT <= MAX_DISPLAY_BUFFER_SIZE / (EPD::WIDTH / 8) \
          ? EPD::HEIGHT                                         \
          : MAX_DISPLAY_BUFFER_SIZE / (EPD::WIDTH / 8));
+
+
+WiFiClient client;
 
 void drawCenteredText(const char* text) {
     int16_t tbx, tby;
@@ -103,6 +111,50 @@ void drawSongInfos(String songName, String artistName, String albumName, float h
     } while (display.nextPage());
 }
 
+void downvoteCallback() {
+    display.firstPage();
+    do {
+        display.fillScreen(GxEPD_WHITE);
+        display.setCursor(18, 18);
+        display.print("Skipping");
+    } while (display.nextPage());
+
+    String jsonString = "{ \"uuid\": \"" + WiFi.macAddress() + "\"}";
+
+    if (client.connect(StationClientClass::getStationHost().c_str(), StationClientClass::getStationPort())) {
+        Serial.println("connected to server");
+        client.println("POST /api/voting/dislike HTTP/1.1");
+        client.println("Host: " + StationClientClass::getStationHost() + ":" + StationClientClass::getStationPort());
+        client.println("Content-Type: application/json");
+        client.print("Content-Length: ");
+        client.println(jsonString.length());
+        client.println();
+        client.println(jsonString);
+    }
+}
+
+void upvoteCallback() {
+    display.firstPage();
+    do {
+        display.fillScreen(GxEPD_WHITE);
+        display.setCursor(18, 18);
+        display.print("Liking");
+    } while (display.nextPage());
+
+    String jsonString = "{ \"uuid\": \"" + WiFi.macAddress() + "\"}";
+
+    if (client.connect(StationClientClass::getStationHost().c_str(), StationClientClass::getStationPort())) {
+        Serial.println("connected to server");
+        client.println("POST /api/voting/like HTTP/1.1");
+        client.println("Host: " + StationClientClass::getStationHost() + ":" + StationClientClass::getStationPort());
+        client.println("Content-Type: application/json");
+        client.print("Content-Length: ");
+        client.println(jsonString.length());
+        client.println();
+        client.println(jsonString);
+    }
+}
+
 void setup() {
     Serial.begin(115200);
 
@@ -137,6 +189,10 @@ void setup() {
     }
 
     webserver_start(isReady);
+    pinMode(SKIP_BUTTON, INPUT_PULLUP);
+    pinMode(LIKE_BUTTON, INPUT_PULLUP);
+    attachInterrupt(SKIP_BUTTON, downvoteCallback, RISING);
+    attachInterrupt(SKIP_BUTTON, upvoteCallback, RISING);
 }
 
 void loop() {

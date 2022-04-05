@@ -24,7 +24,7 @@
 SocketIOclient socketIO;
 
 String host = "";
-u16_t port = 0;
+uint16_t port = 0;
 
 String track = "";
 String artist = "";
@@ -191,11 +191,18 @@ bool StationClientClass::isConnected() { return connected; }
  * Get the host of the station.
  */
 String StationClientClass::getStationHost() {
-    if (host.isEmpty() || port == 0) {
+    if (host.isEmpty()) {
         return "";
     }
 
-    return "http://" + host + ":" + port;
+    return host;
+}
+
+/**
+ * Get the port of the station.
+ */
+uint16_t StationClientClass::getStationPort() {
+    return port;
 }
 
 /**
