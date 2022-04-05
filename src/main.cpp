@@ -34,7 +34,6 @@ GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> display(GxEPD2_213_B74(
          ? EPD::HEIGHT                                         \
          : MAX_DISPLAY_BUFFER_SIZE / (EPD::WIDTH / 8));
 
-
 WiFiClient client;
 
 void drawCenteredText(const char* text) {
@@ -91,7 +90,8 @@ void setupDisplay() {
     display.setTextColor(GxEPD_BLACK);
 }
 
-void drawSongInfos(String songName, String artistName, String albumName, float heights[23]) {
+void drawSongInfos(String songName, String artistName, String albumName,
+                   float heights[23]) {
     display.firstPage();
     do {
         display.fillScreen(GxEPD_WHITE);
@@ -106,7 +106,8 @@ void drawSongInfos(String songName, String artistName, String albumName, float h
         display.print(albumName.c_str());
         display.drawInvertedBitmap(5, 76, icon_spotify, 40, 40, GxEPD_BLACK);
         for (int i = 0; i < 23; i++) {
-            display.fillRect(55+i*8, 95-(heights[i]) / 20.0 * 4, 5, (heights[i]) / 20.0 * 8.1, GxEPD_BLACK);
+            display.fillRect(55 + i * 8, 95 - (heights[i]) / 20.0 * 4, 5,
+                             (heights[i]) / 20.0 * 8.1, GxEPD_BLACK);
         }
     } while (display.nextPage());
 }
@@ -119,12 +120,14 @@ void downvoteCallback() {
         display.print("Skipping");
     } while (display.nextPage());
 
-    String jsonString = "{ \"uuid\": \"" + WiFi.macAddress() + "\"}";
+    String jsonString = "{ \"mac\": \"" + WiFi.macAddress() + "\"}";
 
-    if (client.connect(StationClientClass::getStationHost().c_str(), StationClientClass::getStationPort())) {
+    if (client.connect(StationClientClass::getStationHost().c_str(),
+                       StationClientClass::getStationPort())) {
         Serial.println("connected to server");
         client.println("POST /api/voting/dislike HTTP/1.1");
-        client.println("Host: " + StationClientClass::getStationHost() + ":" + StationClientClass::getStationPort());
+        client.println("Host: " + StationClientClass::getStationHost() + ":" +
+                       StationClientClass::getStationPort());
         client.println("Content-Type: application/json");
         client.print("Content-Length: ");
         client.println(jsonString.length());
@@ -141,12 +144,14 @@ void upvoteCallback() {
         display.print("Liking");
     } while (display.nextPage());
 
-    String jsonString = "{ \"uuid\": \"" + WiFi.macAddress() + "\"}";
+    String jsonString = "{ \"mac\": \"" + WiFi.macAddress() + "\"}";
 
-    if (client.connect(StationClientClass::getStationHost().c_str(), StationClientClass::getStationPort())) {
+    if (client.connect(StationClientClass::getStationHost().c_str(),
+                       StationClientClass::getStationPort())) {
         Serial.println("connected to server");
         client.println("POST /api/voting/like HTTP/1.1");
-        client.println("Host: " + StationClientClass::getStationHost() + ":" + StationClientClass::getStationPort());
+        client.println("Host: " + StationClientClass::getStationHost() + ":" +
+                       StationClientClass::getStationPort());
         client.println("Content-Type: application/json");
         client.print("Content-Length: ");
         client.println(jsonString.length());
