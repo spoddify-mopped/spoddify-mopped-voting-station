@@ -14,7 +14,7 @@
  * This enables the SPIFFS editor under '/edit'.
  * It should be disabled for production.
  */
-#define SPIFFS_EDITOR
+// #define SPIFFS_EDITOR
 
 #ifdef SPIFFS_EDITOR
 #include "SPIFFSEditor.h"
