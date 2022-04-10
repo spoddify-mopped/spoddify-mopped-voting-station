@@ -26,7 +26,7 @@
 
 #define SKIP_BUTTON 21
 #define LIKE_BUTTON 26
-#define SLEEP_BUTTON 23
+#define SLEEP_BUTTON 12
 #define VOTE_RESET_TIME 3000
 
 bool likeButtonPressed = false;
@@ -193,7 +193,7 @@ void loop() {
 
     if (sleepButtonPressed) {
         drawCenteredTextWithLogo("Zzzzzzz");
-        esp_sleep_enable_ext0_wakeup((gpio_num_t) SLEEP_BUTTON, 1);
+        esp_sleep_enable_ext0_wakeup((gpio_num_t) SLEEP_BUTTON, 0);
         esp_deep_sleep_start();
     }
 
