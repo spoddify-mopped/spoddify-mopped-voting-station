@@ -7,7 +7,8 @@
 
 #include <WString.h>
 
-typedef void (*PlayerEventCallback)(String track, String artist, String album, float heights[23]);
+typedef void (*PlayerEventCallback)(String track, String artist, String album,
+                                    float heights[23]);
 
 typedef void (*ConnectionChangedCallback)(bool connected);
 
@@ -19,6 +20,9 @@ class StationClientClass {
     static bool isConnected();
     static String getStationHost();
     static uint16_t getStationPort();
+    static void refreshPlayer();
+    static void dislike();
+    static void like();
     static void loop();
 };
 

@@ -26,6 +26,12 @@
 
 #define SKIP_BUTTON 21
 #define LIKE_BUTTON 26
+#define VOTE_RESET_TIME 3000
+
+bool likeButtonPressed = false;
+bool dislikeButtonPressed = false;
+
+uint32_t resetDisplay = 0;
 
 GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> display(GxEPD2_213_B74(
     /*CS=5*/ 5, /*DC=*/17, /*RST=*/16, /*BUSY=*/4));  // GxEPD2_213_B74
@@ -33,8 +39,6 @@ GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> display(GxEPD2_213_B74(
     (EPD::HEIGHT <= MAX_DISPLAY_BUFFER_SIZE / (EPD::WIDTH / 8) \
          ? EPD::HEIGHT                                         \
          : MAX_DISPLAY_BUFFER_SIZE / (EPD::WIDTH / 8));
-
-WiFiClient client;
 
 void drawCenteredText(const char* text) {
     int16_t tbx, tby;
@@ -112,53 +116,9 @@ void drawSongInfos(String songName, String artistName, String albumName,
     } while (display.nextPage());
 }
 
-void downvoteCallback() {
-    display.firstPage();
-    do {
-        display.fillScreen(GxEPD_WHITE);
-        display.setCursor(18, 18);
-        display.print("Skipping");
-    } while (display.nextPage());
+void downvoteCallback() { dislikeButtonPressed = true; }
 
-    String jsonString = "{ \"mac\": \"" + WiFi.macAddress() + "\"}";
-
-    if (client.connect(StationClientClass::getStationHost().c_str(),
-                       StationClientClass::getStationPort())) {
-        Serial.println("connected to server");
-        client.println("POST /api/voting/dislike HTTP/1.1");
-        client.println("Host: " + StationClientClass::getStationHost() + ":" +
-                       StationClientClass::getStationPort());
-        client.println("Content-Type: application/json");
-        client.print("Content-Length: ");
-        client.println(jsonString.length());
-        client.println();
-        client.println(jsonString);
-    }
-}
-
-void upvoteCallback() {
-    display.firstPage();
-    do {
-        display.fillScreen(GxEPD_WHITE);
-        display.setCursor(18, 18);
-        display.print("Liking");
-    } while (display.nextPage());
-
-    String jsonString = "{ \"mac\": \"" + WiFi.macAddress() + "\"}";
-
-    if (client.connect(StationClientClass::getStationHost().c_str(),
-                       StationClientClass::getStationPort())) {
-        Serial.println("connected to server");
-        client.println("POST /api/voting/like HTTP/1.1");
-        client.println("Host: " + StationClientClass::getStationHost() + ":" +
-                       StationClientClass::getStationPort());
-        client.println("Content-Type: application/json");
-        client.print("Content-Length: ");
-        client.println(jsonString.length());
-        client.println();
-        client.println(jsonString);
-    }
-}
+void upvoteCallback() { likeButtonPressed = true; }
 
 void setup() {
     Serial.begin(115200);
@@ -197,13 +157,40 @@ void setup() {
     pinMode(SKIP_BUTTON, INPUT_PULLUP);
     pinMode(LIKE_BUTTON, INPUT_PULLUP);
     attachInterrupt(SKIP_BUTTON, downvoteCallback, RISING);
-    attachInterrupt(SKIP_BUTTON, upvoteCallback, RISING);
+    attachInterrupt(LIKE_BUTTON, upvoteCallback, RISING);
 }
 
 void loop() {
     if (restartTime > 0 && millis() >= restartTime) {
         restartTime = 0;
         ESP.restart();
+    }
+
+    if (likeButtonPressed) {
+        likeButtonPressed = false;
+
+        if (StationClient.isConnected()) {
+            drawCenteredTextWithLogo("Liked");
+            StationClient.like();
+            resetDisplay = millis() + VOTE_RESET_TIME;
+        }
+    }
+
+    if (dislikeButtonPressed) {
+        dislikeButtonPressed = false;
+        if (StationClient.isConnected()) {
+            drawCenteredTextWithLogo("Disliked");
+            StationClient.dislike();
+            resetDisplay = millis() + VOTE_RESET_TIME;
+        }
+    }
+
+    if (resetDisplay > 0 && millis() >= resetDisplay) {
+        resetDisplay = 0;
+
+        if (StationClient.isConnected()) {
+            StationClient.refreshPlayer();
+        }
     }
 
     StationClient.loop();

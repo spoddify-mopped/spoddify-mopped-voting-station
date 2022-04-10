@@ -22,6 +22,7 @@
 #define SOCKET_IO_PATH "/socket.io/?EIO=4"
 
 SocketIOclient socketIO;
+WiFiClient wifiClient;
 
 String host = "";
 uint16_t port = 0;
@@ -201,8 +202,47 @@ String StationClientClass::getStationHost() {
 /**
  * Get the port of the station.
  */
-uint16_t StationClientClass::getStationPort() {
-    return port;
+uint16_t StationClientClass::getStationPort() { return port; }
+
+/**
+ * Triggers the player event handler.
+ */
+void StationClientClass::refreshPlayer() {
+    playerEventCallback(track, artist, album, heights);
+}
+
+/**
+ * Send a dislike vote.
+ */
+void StationClientClass::dislike() {
+    String jsonString = "{ \"mac\": \"" + WiFi.macAddress() + "\"}";
+
+    if (wifiClient.connect(host.c_str(), port)) {
+        wifiClient.println("POST /api/voting/dislike HTTP/1.1");
+        wifiClient.println("Host: " + host + ":" + port);
+        wifiClient.println("Content-Type: application/json");
+        wifiClient.print("Content-Length: ");
+        wifiClient.println(jsonString.length());
+        wifiClient.println();
+        wifiClient.println(jsonString);
+    }
+}
+
+/**
+ * Send a like vote.
+ */
+void StationClientClass::like() {
+    String jsonString = "{ \"mac\": \"" + WiFi.macAddress() + "\"}";
+
+    if (wifiClient.connect(host.c_str(), port)) {
+        wifiClient.println("POST /api/voting/like HTTP/1.1");
+        wifiClient.println("Host: " + host + ":" + port);
+        wifiClient.println("Content-Type: application/json");
+        wifiClient.print("Content-Length: ");
+        wifiClient.println(jsonString.length());
+        wifiClient.println();
+        wifiClient.println(jsonString);
+    }
 }
 
 /**
