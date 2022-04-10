@@ -26,10 +26,12 @@
 
 #define SKIP_BUTTON 21
 #define LIKE_BUTTON 26
+#define SLEEP_BUTTON 23
 #define VOTE_RESET_TIME 3000
 
 bool likeButtonPressed = false;
 bool dislikeButtonPressed = false;
+bool sleepButtonPressed = false;
 
 uint32_t resetDisplay = 0;
 
@@ -120,6 +122,8 @@ void downvoteCallback() { dislikeButtonPressed = true; }
 
 void upvoteCallback() { likeButtonPressed = true; }
 
+void sleepCallback() { sleepButtonPressed = true; }
+
 void setup() {
     Serial.begin(115200);
 
@@ -156,8 +160,10 @@ void setup() {
     webserver_start(isReady);
     pinMode(SKIP_BUTTON, INPUT_PULLUP);
     pinMode(LIKE_BUTTON, INPUT_PULLUP);
+    pinMode(SLEEP_BUTTON, INPUT_PULLUP);
     attachInterrupt(SKIP_BUTTON, downvoteCallback, RISING);
     attachInterrupt(LIKE_BUTTON, upvoteCallback, RISING);
+    attachInterrupt(SLEEP_BUTTON, sleepCallback, RISING);
 }
 
 void loop() {
@@ -183,6 +189,12 @@ void loop() {
             StationClient.dislike();
             resetDisplay = millis() + VOTE_RESET_TIME;
         }
+    }
+
+    if (sleepButtonPressed) {
+        drawCenteredTextWithLogo("Zzzzzzz");
+        esp_sleep_enable_ext0_wakeup((gpio_num_t) SLEEP_BUTTON, 1);
+        esp_deep_sleep_start();
     }
 
     if (resetDisplay > 0 && millis() >= resetDisplay) {
